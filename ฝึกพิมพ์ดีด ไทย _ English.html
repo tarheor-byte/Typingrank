@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ฝึกพิมพ์ดีด ไทย / English</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Sarabun:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--bg:#050505;--ink:#f2f2f2;--mute:#6b6b6b;--acc:#ffd21f;--bad:#ff4b4b;--panel:#171717;--bar:#4b4b4b;--line:#2c2c2c;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Sarabun",system-ui,sans-serif}
+body{min-height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+.top{position:relative;z-index:4;display:flex;flex-wrap:wrap;gap:8px 12px;justify-content:center;padding:14px 12px 0}
+.hist{order:-1}
+@media(min-width:900px){.hist{position:absolute;left:12px;top:14px}}
+.hpanel{display:none;position:absolute;left:12px;top:100%;margin-top:8px;width:min(340px,calc(100vw - 24px));max-height:60vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+.hhead{display:flex;justify-content:space-between;align-items:center;font-weight:700}
+.hclear{background:none;border:0;color:var(--mute);font:inherit;font-size:13px;cursor:pointer;text-decoration:underline}
+.hsum{font-size:12px;color:var(--mute);margin:4px 0 8px}
+.hrow{display:flex;gap:12px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
+.hrow b{font-size:26px;min-width:52px;color:var(--acc);font-variant-numeric:tabular-nums}
+.hrow.lost b{color:var(--mute)}
+.hrow span{display:block;font-size:14px}
+.hrow small{color:var(--mute);font-size:12px}
+.hempty{color:var(--mute);font-size:14px;margin:8px 0 0}
+.rank{order:99}
+@media(min-width:900px){.rank{position:absolute;right:12px;top:14px}}
+.hpanel.rpanel{left:auto;right:12px}
+.hrow.me b{color:#fff}
+#nick{width:100%;margin:2px 0 8px;background:#0c0c0c;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:7px 10px;font:inherit;font-size:14px}
+.grp button:disabled{opacity:.35;cursor:not-allowed}
+.grp{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.grp button{border:0;background:none;color:var(--mute);font:inherit;font-size:14px;padding:6px 14px;cursor:pointer}
+.grp button+button{border-left:1px solid var(--line)}
+.grp button[aria-pressed=true]{background:var(--ink);color:#000;font-weight:700}
+#snd[aria-pressed=false]{color:var(--mute)}
+button:focus-visible,textarea:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.stage{flex:1;display:flex;align-items:center;cursor:text;position:relative}
+.track{position:relative;width:100%;padding-bottom:64px;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 18%,#000 82%,transparent);mask-image:linear-gradient(90deg,transparent,#000 18%,#000 82%,transparent)}
+.line{overflow:hidden;height:1.5em;font-size:clamp(34px,8vw,66px);font-family:"JetBrains Mono","Sarabun",monospace;font-weight:700;line-height:1.5}
+#txt{display:inline-block;white-space:pre;transform:translateX(0);transition:transform .09s ease-out;will-change:transform}
+#txt span{color:#7a7a7a}
+#txt span.ok{color:var(--ink)}
+#txt span.cur{color:#fff}
+#txt span.bad{color:var(--bad);background:rgba(255,75,75,.2);border-radius:6px}
+.arrow{position:absolute;left:50%;bottom:14px;width:26px;height:30px;margin-left:-13px;background:var(--acc);clip-path:polygon(50% 0,100% 100%,50% 76%,0 100%)}
+#hint{position:absolute;left:0;right:0;bottom:2px;text-align:center;font-size:15px;color:var(--mute)}
+textarea{position:absolute;opacity:0;left:0;top:0;width:1px;height:1px}
+.foot{display:flex;flex-direction:column;align-items:center;gap:10px;padding:0 12px 28px}
+.wpm{font-style:italic;font-weight:700;font-size:22px}
+.cells{display:flex;gap:12px}
+.cell{width:min(150px,38vw);text-align:center}
+.cell b{display:block;font-size:24px;font-weight:700;font-variant-numeric:tabular-nums;margin-bottom:4px}
+.cell span{display:block;background:var(--bar);font-size:12px;padding:2px 0;color:#eee}
+.ovl{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;padding:18px;overflow:auto;z-index:5}
+.card{width:min(560px,100%);background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px}
+.card h2{margin:0;font-size:20px}
+.big{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:4px 0 2px}
+.big b{font-size:clamp(56px,16vw,88px);font-weight:800;line-height:1;color:var(--acc)}
+.big span{font-size:18px}
+.lvl{font-size:20px;font-weight:700;margin:0 0 16px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-bottom:20px}
+.stats div{border-left:3px solid var(--bar);padding-left:12px}
+.stats b{display:block;font-size:22px}
+.stats span{font-size:13px;color:var(--mute)}
+.scale{position:relative;height:10px;border-radius:5px;background:linear-gradient(90deg,#444 0 20%,#666 20% 40%,#8a8a8a 40% 60%,#bdbdbd 60% 80%,#fff 80%);margin:6px 0}
+.scale i{position:absolute;top:-7px;width:4px;height:24px;border-radius:2px;background:var(--acc);transform:translateX(-50%)}
+.ticks{display:flex;justify-content:space-between;font-size:12px;color:var(--mute)}
+.best{margin:14px 0 0;color:var(--mute);font-size:14px;min-height:1.3em}
+.btn{margin-top:14px;background:var(--acc);color:#000;border:0;border-radius:10px;font:inherit;font-weight:700;padding:10px 22px;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="grp" id="lang" role="group" aria-label="ภาษา">
+    <button data-v="th" aria-pressed="true">ไทย</button>
+    <button data-v="en" aria-pressed="false">English</button>
+  </div>
+  <div class="grp" id="len" role="group" aria-label="ความยาวข้อความ">
+    <button data-v="60" aria-pressed="false">สั้น</button>
+    <button data-v="120" aria-pressed="true">กลาง</button>
+    <button data-v="200" aria-pressed="false">ยาว</button>
+  </div>
+  <div class="grp" id="mode" role="group" aria-label="โหมด"><button id="mOff" aria-pressed="true">📴 ออฟไลน์</button><button id="mOn" aria-pressed="false" disabled title="ต้องเปิดผ่านลิงก์ claude.ai ที่เข้าสู่ระบบแล้ว">🌐 ออนไลน์</button></div>
+  <div class="grp"><button id="snd" aria-pressed="true">🔊 เสียง</button></div>
+  <div class="grp rank" id="rankgrp" style="display:none"><button id="rbtn" aria-expanded="false" aria-pressed="false">🏆 อันดับ</button></div>
+  <div class="hpanel rpanel" id="rpanel">
+    <div class="hhead"><span>อันดับออนไลน์ (10 อันดับแรก)</span></div>
+    <div class="hsum" id="rsum"></div>
+    <input id="nick" maxlength="16" placeholder="ชื่อที่แสดงในอันดับ" aria-label="ชื่อที่แสดงในอันดับ">
+    <div id="rbody"></div>
+  </div>
+  <div class="grp hist"><button id="hbtn" aria-expanded="false" aria-pressed="false">📜 ประวัติ</button></div>
+  <div class="hpanel" id="hpanel">
+    <div class="hhead"><span>ประวัติการเล่น</span><button class="hclear" id="hclear">ล้างทั้งหมด</button></div>
+    <div class="hsum" id="hsum"></div>
+    <div id="hbody"></div>
+  </div>
+</div>
+
+<div class="stage" id="stage">
+  <div class="track">
+    <div class="line"><div id="txt"></div></div>
+    <div class="arrow"></div>
+    <div id="hint">คลิกแล้วเริ่มพิมพ์ · ต้องพิมพ์สระและวรรณยุกต์ให้ตรง · Esc เริ่มใหม่</div>
+  </div>
+  <textarea id="ta" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="พิมพ์ที่นี่"></textarea>
+</div>
+
+<div class="foot">
+  <div class="wpm"><span id="lw">0</span> WPM</div>
+  <div class="cells">
+    <div class="cell"><b id="lc">0/0</b><span>ตัวอักษร</span></div>
+    <div class="cell"><b id="time">0.0</b><span>เวลา (วินาที)</span></div>
+  </div>
+</div>
+
+<div class="ovl" id="ovl">
+  <section class="card" aria-live="polite">
+    <h2>สรุปผล</h2>
+    <div class="big"><b id="rw">0</b><span>คำต่อนาที (WPM)</span></div>
+    <p class="lvl" id="rl"></p>
+    <div class="stats">
+      <div><b id="ra">0%</b><span>ความแม่นยำ</span></div>
+      <div><b id="rc">0</b><span>ตัวอักษรต่อนาที</span></div>
+      <div><b id="rt">0</b><span>เวลา (วินาที)</span></div>
+      <div><b id="re">0</b><span>พิมพ์ผิด</span></div>
+    </div>
+    <div class="scale"><i id="mk"></i></div>
+    <div class="ticks"><span>0</span><span>20</span><span>40</span><span>60</span><span>80</span><span>100+</span></div>
+    <p class="best" id="best"></p>
+    <p class="best" id="onl"></p>
+    <button class="btn" id="again">เล่นอีกครั้ง</button>
+  </section>
+</div>
+
+<script>
+const WORDS={
+th:"ฉันชอบกินข้าว|วันนี้อากาศดี|ประเทศไทยสวยงาม|เรียนรู้ทุกวัน|ครอบครัวอบอุ่น|เพื่อนรักของฉัน|ไปโรงเรียน|ทำงานหนัก|พักผ่อนบ้าง|ดื่มน้ำเยอะๆ|ตลาดนัดสุดสัปดาห์|ร้านกาแฟเล็กๆ|ฝนตกหนัก|เดินทางไกล|อ่านหนังสือ|ฟังเพลงเพราะ|ภาษาไทยสวยงาม|พิมพ์ให้เร็วขึ้น|ความพยายามอยู่ที่ไหน|ความสำเร็จอยู่ที่นั่น|สุขภาพดีเริ่มที่ตัวเรา|ผ้าไหมไทย|ปลาทูทอดกรอบ|ส้มตำรสเด็ด|ท้องฟ้าสีคราม|ดอกไม้บานสะพรั่ง|แม่น้ำมูลไหลผ่าน|อุบลราชธานี|วัดป่าสงบร่มเย็น|เด็กน้อยหัวเราะ|ช้างเดินในป่า|รถไฟสายเหนือ|ขอบคุณมากครับ|สวัสดีค่ะ|ไม่เป็นไร|เจอกันพรุ่งนี้|ทะเลสวยน้ำใส|ข้าวเหนียวมะม่วง|ต้นไม้ให้ร่มเงา|เรื่องเล่าเก่าๆ|ผู้ใหญ่ใจดี|เสียงน้ำไหลเอื่อย|เกี่ยวข้องกัน|เพียงพอแล้ว|สิ่งที่สำคัญ|ปู่ย่าตายาย|เขื่อนใหญ่|ขึ้นเขาลงห้วย".split("|"),
+en:"trench guess range quick brown fox jumps over lazy dog practice makes progress keep your fingers on the home row type with rhythm and stay relaxed small steps every day coffee quiet morning rain window good habit starts today read page write line river runs past old town fresh bread market walk along beach sunset speed comes after accuracy focus each word time flies learn something new bright ideas clear words simple tools build great things patience best teacher look screen not keys".split(" ")
+};
+const $=id=>document.getElementById(id);
+let AC=null,soundOn=true;
+try{soundOn=localStorage.getItem('snd')!=='0'}catch(e){}
+function tone(f,d,type,vol,when,slide){
+  const t=AC.currentTime+(when||0),o=AC.createOscillator(),g=AC.createGain();
+  o.type=type;o.frequency.setValueAtTime(f,t);if(slide)o.frequency.exponentialRampToValueAtTime(slide,t+d);
+  g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(0.0001,t+d);
+  o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d+.02);
+}
+function sfx(k){
+  if(!soundOn)return;
+  try{
+    if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();
+    if(AC.state==='suspended')AC.resume();
+    if(k==='key')tone(900+Math.random()*250,.045,'square',.05,0,300);
+    else if(k==='bad')tone(170,.16,'sawtooth',.09,0,90);
+    else if(k==='back')tone(420,.05,'triangle',.06,0,260);
+    else if(k==='heart')tone(300,.3,'sawtooth',.1,0,110);
+    else if(k==='end'){[523,659,784,1047].forEach((f,i)=>tone(f,.28,'triangle',.14,i*.12))}
+    else if(k==='lose'){[392,311,247].forEach((f,i)=>tone(f,.3,'triangle',.12,i*.15))}
+  }catch(e){}
+}
+function paintSnd(){const b=$('snd');b.setAttribute('aria-pressed',soundOn);b.textContent=soundOn?'🔊 เสียง':'🔇 เสียง'}
+$('snd').addEventListener('click',()=>{soundOn=!soundOn;try{localStorage.setItem('snd',soundOn?'1':'0')}catch(e){}paintSnd();sfx('key');$('ta').focus()});
+paintSnd();
+
+const HK='hist1';
+function loadHist(){try{return JSON.parse(localStorage.getItem(HK)||'[]')}catch(e){return[]}}
+let HIST=loadHist();
+function saveHist(r){HIST.unshift(r);HIST=HIST.slice(0,50);try{localStorage.setItem(HK,JSON.stringify(HIST))}catch(e){}paintHist()}
+function ago(t){const s=(Date.now()-t)/1000;if(s<60)return'เมื่อกี้';if(s<3600)return Math.floor(s/60)+' นาทีที่แล้ว';if(s<86400)return Math.floor(s/3600)+' ชม.ที่แล้ว';return new Date(t).toLocaleDateString('th-TH',{day:'numeric',month:'short'})}
+function paintHist(){
+  const b=$('hbody');
+  if(!HIST.length){b.innerHTML='<p class="hempty">ยังไม่มีประวัติ เล่นให้จบรอบแรกเพื่อบันทึกผล</p>';$('hsum').textContent='';return}
+  const best=Math.max(...HIST.map(h=>h.wpm)),avg=Math.round(HIST.reduce((a,h)=>a+h.wpm,0)/HIST.length);
+  $('hsum').textContent='ทั้งหมด '+HIST.length+' รอบ · สูงสุด '+best+' · เฉลี่ย '+avg+' WPM';
+  b.innerHTML=HIST.map(h=>'<div class="hrow'+(h.lost?' lost':'')+'"><b>'+h.wpm+'</b><div><span>'+(h.lang==='th'?'ไทย':'English')+' · '+h.len+' ตัว'+(h.lost?' · หัวใจหมด':'')+'</span><small>แม่นยำ '+h.acc+'% · '+h.sec+' วิ · '+ago(h.t)+'</small></div></div>').join('')
+}
+function toggleHist(open){
+  const p=$('hpanel'),o=open===undefined?p.style.display!=='block':open;
+  p.style.display=o?'block':'none';$('hbtn').setAttribute('aria-expanded',o);$('hbtn').setAttribute('aria-pressed',o);
+  if(o)paintHist();
+}
+$('hbtn').addEventListener('click',()=>{toggleHist();$('ta').focus()});
+$('hclear').addEventListener('click',()=>{HIST=[];try{localStorage.removeItem(HK)}catch(e){}paintHist()});
+paintHist();
+
+let DB=null,UID=null,online=false,unsub=null,NICK='',WANT=false;
+try{WANT=localStorage.getItem('mode')==='on';NICK=localStorage.getItem('nick')||''}catch(e){}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function mkey(){return lang+'_'+len}
+function paintMode(){
+  $('mOff').setAttribute('aria-pressed',!online);$('mOn').setAttribute('aria-pressed',online);
+  $('rankgrp').style.display=online?'':'none';if(!online)toggleRank(false);
+}
+function toggleRank(open){const p=$('rpanel'),o=open===undefined?p.style.display!=='block':open;p.style.display=o?'block':'none';$('rbtn').setAttribute('aria-expanded',o);$('rbtn').setAttribute('aria-pressed',o)}
+function setMode(on){
+  if(on&&!DB)return;online=on;
+  try{localStorage.setItem('mode',on?'on':'off')}catch(e){}
+  paintMode();watchBoard();$('ta').focus();
+}
+function watchBoard(){
+  if(unsub){unsub();unsub=null}
+  const body=$('rbody');if(!online||!DB){body.innerHTML='';return}
+  $('rsum').textContent=(lang==='th'?'ภาษาไทย':'English')+' · '+len+' ตัวอักษร';
+  const f='wpm_'+mkey(),a='acc_'+mkey();
+  unsub=DB.collection('scores').orderBy(f,'desc').limit(10).onSnapshot(s=>{
+    if(!s.docs.length){body.innerHTML='<p class="hempty">ยังไม่มีใครในอันดับนี้ เป็นคนแรกเลย!</p>';return}
+    body.innerHTML=s.docs.map((d,i)=>{const x=d.data()||{},me=d.id===UID;
+      return '<div class="hrow'+(me?' me':'')+'"><b>'+esc(x[f])+'</b><div><span>#'+(i+1)+' '+esc(x.name||'ไม่ระบุชื่อ')+(me?' (คุณ)':'')+'</span><small>แม่นยำ '+esc(x[a])+'%</small></div></div>'}).join('');
+  },()=>{body.innerHTML='<p class="hempty">โหลดอันดับไม่สำเร็จ</p>'});
+}
+async function submitScore(s){
+  const el=$('onl');
+  if(!online||!DB||!UID){el.textContent='โหมดออฟไลน์: บันทึกเฉพาะในเครื่องนี้';return}
+  try{
+    const ref=DB.collection('scores').doc(UID),snap=await ref.get(),old=(snap.exists&&snap.data())||{},k=mkey();
+    if((old['wpm_'+k]||0)>=s.wpm){el.textContent='ยังไม่ทำลายสถิติอันดับเดิมของคุณ ('+old['wpm_'+k]+' WPM)';return}
+    await ref.set(Object.assign({},old,{name:NICK||'ผู้เล่น',['wpm_'+k]:s.wpm,['acc_'+k]:s.acc,['t_'+k]:Date.now()}));
+    el.textContent='ส่งคะแนนขึ้นอันดับออนไลน์แล้ว!';
+  }catch(e){el.textContent='ส่งคะแนนออนไลน์ไม่สำเร็จ (ต้องมีสิทธิ์ผู้ร่วมแก้ไขของหน้านี้) — บันทึกในเครื่องแล้ว'}
+}
+async function initOnline(){
+  try{
+    if(window.claude&&claude.use){
+      DB=await claude.use('db');const u=await claude.use('user');
+      UID=(DB&&u)?await u.id():null;
+    }
+  }catch(e){DB=null}
+  if(!DB||!UID){DB=null;return}
+  $('mOn').disabled=false;$('mOn').title='';
+  online=WANT;paintMode();watchBoard();
+}
+$('mOff').onclick=()=>setMode(false);
+$('mOn').onclick=()=>setMode(true);
+$('rbtn').addEventListener('click',()=>{toggleRank();$('ta').focus()});
+$('nick').value=NICK;
+$('nick').addEventListener('change',async()=>{
+  NICK=$('nick').value.trim().slice(0,16);try{localStorage.setItem('nick',NICK)}catch(e){}
+  if(DB&&UID){try{const r=DB.collection('scores').doc(UID),s=await r.get();if(s.exists)await r.update({name:NICK||'ผู้เล่น'})}catch(e){}}
+});
+
+let lang="th",len=120,target="",spans=[],cl=[],cidx=[],prev=0,total=0,wrong=0,started=false,done=false,t0=0,timer=null;
+
+function gen(n){const w=WORDS[lang];let s="";while(s.length<n){s+=(s?" ":"")+w[Math.floor(Math.random()*w.length)]}return s.slice(0,n).trimEnd()}
+function center(){
+  const cur=spans[cidx[Math.min(prev,cidx.length-1)]];if(!cur)return;
+  const w=$("txt").parentElement.clientWidth;
+  $("txt").style.transform="translateX("+(w/2-(cur.offsetLeft+cur.offsetWidth/2))+"px)";
+}
+function reset(){
+  clearInterval(timer);started=done=false;prev=total=wrong=0;
+  target=gen(len);spans=[];cl=[];cidx=[];$("txt").innerHTML="";
+  const re=/[^\u0E31\u0E33-\u0E3A\u0E47-\u0E4E][\u0E31\u0E33-\u0E3A\u0E47-\u0E4E]*|[\u0E31\u0E33-\u0E3A\u0E47-\u0E4E]+/g;
+  let m;while((m=re.exec(target))){const sp=document.createElement("span");sp.textContent=m[0];$("txt").appendChild(sp);cl.push({s:m.index,e:m.index+m[0].length,el:sp});for(let k=0;k<m[0].length;k++)cidx.push(cl.length-1)}
+  spans=cl.map(c=>c.el);spans[0].className="cur";
+  $("ta").value="";$("ta").disabled=false;
+  $("lc").textContent="0/"+target.length;$("time").textContent="0.0";$("lw").textContent=0;
+  $("ovl").style.display="none";$("hint").style.display="block";
+  $("txt").style.transition="none";center();void $("txt").offsetWidth;$("txt").style.transition="";
+  $("ta").focus();
+}
+function correctCount(v){let c=0;for(let i=0;i<v.length;i++)if(v[i]===target[i])c++;return c}
+function stats(el){
+  const c=correctCount($("ta").value),min=Math.max(el,1)/60;
+  return{c,wpm:Math.round(c/5/min),cpm:Math.round(c/min),acc:total?Math.round((total-wrong)/total*100):100};
+}
+function render(v){
+  for(const c of cl){const t=v.slice(c.s,c.e),g=target.slice(c.s,c.e);
+    c.el.className=v.length>=c.e?(t===g?"ok":"bad"):v.length>c.s?"bad":v.length===c.s?"cur":""}
+  prev=v.length;center();
+  $("lc").textContent=Math.min(v.length,target.length)+"/"+target.length;
+}
+function tick(){
+  const el=(Date.now()-t0)/1000;
+  $("time").textContent=el.toFixed(1);
+  if(el>=1)$("lw").textContent=stats(el).wpm;
+}
+function level(w){
+  if(w<20)return"ผู้เริ่มต้น — ค่อยๆ ฝึกต่อไป";
+  if(w<40)return"พอใช้ — เริ่มคล่องแล้ว";
+  if(w<60)return"ดี — เร็วกว่าคนทั่วไป";
+  if(w<80)return"เร็วมาก — ระดับมือโปร";
+  return"เทพแป้นพิมพ์!";
+}
+function finish(outOfHearts){
+  if(done)return;done=true;clearInterval(timer);$("ta").disabled=true;
+  const el=(Date.now()-t0)/1000,s=stats(el);
+  sfx(outOfHearts?'lose':'end');
+  $("rw").textContent=s.wpm;
+  $("rl").textContent=(outOfHearts?"หัวใจหมดก่อนพิมพ์จบ — ":"")+level(s.wpm);
+  $("ra").textContent=s.acc+"%";$("rc").textContent=s.cpm;$("rt").textContent=el.toFixed(1);$("re").textContent=wrong;
+  $("mk").style.left=Math.min(100,s.wpm)+"%";
+  const key="best2-"+lang+"-"+len;let best=0;
+  try{best=+localStorage.getItem(key)||0;if(!outOfHearts&&s.wpm>best)localStorage.setItem(key,s.wpm)}catch(e){}
+  $("best").textContent=(!outOfHearts&&s.wpm>best)?"สถิติใหม่ของโหมดนี้!":(best?"สถิติสูงสุดของโหมดนี้: "+best+" WPM":"");
+  saveHist({t:Date.now(),lang,len,wpm:s.wpm,acc:s.acc,sec:el.toFixed(1),lost:!!outOfHearts});
+  $("onl").textContent="";submitScore(s);
+  $("ovl").style.display="flex";
+}
+$("ta").addEventListener("input",()=>{
+  if(done)return;const v=$("ta").value;
+  if(!started){started=true;t0=Date.now();timer=setInterval(tick,100);$("hint").style.display="none"}
+  let bad=false;
+  for(let i=prev;i<v.length;i++){total++;if(v[i]!==target[i]){wrong++;bad=true}}
+  if(v.length<prev)sfx('back');else sfx(bad?'bad':'key');
+  render(v);
+  if(v.length>=target.length)finish(false);
+});
+$("stage").addEventListener("click",()=>{toggleHist(false);toggleRank(false);$("ta").focus()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){e.preventDefault();reset()}});
+$("again").onclick=reset;
+window.addEventListener("resize",center);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(center);
+function group(id,cb){
+  const g=$(id);g.addEventListener("click",e=>{
+    const b=e.target.closest("button");if(!b)return;
+    g.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));
+    cb(b.dataset.v);reset();
+  });
+}
+group("lang",v=>{lang=v;watchBoard()});
+group("len",v=>{len=+v;watchBoard()});
+reset();
+initOnline();
+</script>
+</body>
+</html>
